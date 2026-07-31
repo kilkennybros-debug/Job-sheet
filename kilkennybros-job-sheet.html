@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0b3d63">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>KilkennyBros Plumbing — Job Sheet</title>
 <style>
   :root{
@@ -165,16 +168,29 @@
         <input type="text" id="jobCode" placeholder="Job code">
         <div class="error">Please enter the job code.</div>
       </div>
+      <div class="field">
+        <label>Site Address</label>
+        <input type="text" id="siteAddress" placeholder="Site address">
+      </div>
       <div class="field" data-field="workers">
         <label class="req">Workers</label>
-        <select id="workers">
-          <option value="">Select...</option>
-          <option value="Tim">Tim</option>
-          <option value="Daniel">Daniel</option>
-          <option value="Apprentice">Apprentice</option>
-          <option value="Subcontractor">Subcontractor</option>
-        </select>
-        <div class="error">Please select the worker on this job.</div>
+        <div class="checkrow">
+          <input type="checkbox" id="wTim" value="Tim">
+          <label for="wTim">Tim</label>
+        </div>
+        <div class="checkrow">
+          <input type="checkbox" id="wDaniel" value="Daniel">
+          <label for="wDaniel">Daniel</label>
+        </div>
+        <div class="checkrow">
+          <input type="checkbox" id="wApprentice" value="Apprentice">
+          <label for="wApprentice">Apprentice</label>
+        </div>
+        <div class="checkrow">
+          <input type="checkbox" id="wSubcontractor" value="Subcontractor">
+          <label for="wSubcontractor">Subcontractor</label>
+        </div>
+        <div class="error">Please select at least one worker on this job.</div>
       </div>
     </div>
 
@@ -276,7 +292,7 @@
 
     <div class="total-box">
       <div>
-        <span class="label">Estimated Total (excl. GST)</span>
+        <span class="label">Estimated Total (inc. GST)</span>
         <span class="amount" id="totalAmount">$0.00</span>
         <span class="breakdown" id="totalBreakdown">Labour $0.00 + Materials $0.00</span>
       </div>
@@ -301,12 +317,13 @@
     <div class="stack">
       <button class="btn btn-primary btn-full" id="shareBtn">Share Job Sheet + Photos</button>
       <button class="btn btn-navy btn-full" id="mailtoBtn">Open Email (pre-filled)</button>
+      <button class="btn btn-ghost btn-full" id="downloadSummaryBtn">Download Job Sheet</button>
       <button class="btn btn-ghost btn-full" id="downloadPhotosBtn">Download Photos to Device</button>
       <button class="btn btn-ghost btn-full" id="newJobBtn">Start New Job Sheet</button>
     </div>
 
     <div class="note" id="shareNote">
-      Tap <strong>Share Job Sheet + Photos</strong> to open your phone's share sheet and send everything (summary + photos) straight from Mail, Gmail, or Messages. Your mail app may not auto-fill the "To" field — the office email is copied to your clipboard, just paste it in.
+      Tap <strong>Share Job Sheet + Photos</strong> to open your phone's share sheet and send everything as file attachments (not pasted into the email text) straight from Mail, Gmail, or Messages. Your mail app may not auto-fill the "To" field — the office email is copied to your clipboard, just paste it in. If sharing isn't available, use <strong>Download Job Sheet</strong> and <strong>Download Photos</strong> first, then attach them manually in your email app.
     </div>
   </div>
 </div>
@@ -341,13 +358,16 @@
 
   var fields = {
     jobType: $("jobType"), jobDate: $("jobDate"), customer: $("customer"), jobCode: $("jobCode"),
-    workers: $("workers"), worksCarried: $("worksCarried"),
+    siteAddress: $("siteAddress"),
+    worksCarried: $("worksCarried"),
+    wTim: $("wTim"), wDaniel: $("wDaniel"), wApprentice: $("wApprentice"), wSubcontractor: $("wSubcontractor"),
     mReline: $("mReline"), mFlex: $("mFlex"), mOther: $("mOther"), mOtherText: $("mOtherText"),
     eqCamera: $("eqCamera"), eqSewer: $("eqSewer"), eqDemo: $("eqDemo"), eqExcavation: $("eqExcavation"), eqLeak: $("eqLeak"),
     costPurchased: $("costPurchased"), costStock: $("costStock"), costReline: $("costReline"),
     hoursNormal: $("hoursNormal"), hoursApprentice: $("hoursApprentice"), hoursAfter: $("hoursAfter")
   };
   var equipmentCheckboxes = [fields.eqCamera, fields.eqSewer, fields.eqDemo, fields.eqExcavation, fields.eqLeak];
+  var workerCheckboxes = [fields.wTim, fields.wDaniel, fields.wApprentice, fields.wSubcontractor];
 
   // ---------- init ----------
   if(!fields.jobDate.value){
@@ -407,8 +427,13 @@
   Object.keys(fields).forEach(function(k){
     var el = fields[k];
     if(!el) return;
-    el.addEventListener("input", function(){ recalcTotal(); saveDraft(); });
-    el.addEventListener("change", function(){ recalcTotal(); saveDraft(); });
+    var onFieldUpdate = function(){ recalcTotal(); saveDraft(); };
+    el.addEventListener("input", onFieldUpdate);
+    el.addEventListener("change", onFieldUpdate);
+    // iOS Safari doesn't always fire "input" for number fields while typing on the
+    // numeric keypad — keyup/blur give a reliable fallback so totals still update live.
+    el.addEventListener("keyup", onFieldUpdate);
+    el.addEventListener("blur", onFieldUpdate);
   });
   recalcTotal();
 
@@ -422,12 +447,14 @@
       var cost = num(cb.getAttribute("data-cost"));
       return cost > 0 ? (cb.value + " ($" + cost.toFixed(2) + ")") : cb.value;
     });
+    var workers = workerCheckboxes.filter(function(cb){ return cb && cb.checked; }).map(function(cb){ return cb.value; });
     return {
       jobType: fields.jobType.value,
       jobDate: fields.jobDate.value,
       customer: fields.customer.value.trim(),
       jobCode: fields.jobCode.value.trim(),
-      workers: fields.workers.value.trim(),
+      siteAddress: fields.siteAddress.value.trim(),
+      workers: workers,
       worksCarried: fields.worksCarried.value.trim(),
       machines: machines,
       equipment: equipment,
@@ -445,7 +472,12 @@
     fields.jobDate.value = data.jobDate || fields.jobDate.value;
     fields.customer.value = data.customer || "";
     fields.jobCode.value = data.jobCode || "";
-    fields.workers.value = data.workers || "";
+    fields.siteAddress.value = data.siteAddress || "";
+    var workersData = data.workers || [];
+    workerCheckboxes.forEach(function(cb){
+      if(!cb) return;
+      cb.checked = workersData.indexOf(cb.value) !== -1;
+    });
     fields.worksCarried.value = data.worksCarried || "";
     fields.mReline.checked = (data.machines||[]).some(function(m){return m.indexOf("Re-Lining")===0;});
     fields.mFlex.checked = (data.machines||[]).some(function(m){return m.indexOf("Flex Shaft")===0;});
@@ -570,8 +602,7 @@
   var requiredFields = [
     { el: fields.jobType, wrap: "jobType" },
     { el: fields.customer, wrap: "customer" },
-    { el: fields.jobCode, wrap: "jobCode" },
-    { el: fields.workers, wrap: "workers" }
+    { el: fields.jobCode, wrap: "jobCode" }
   ];
   function validate(){
     var ok = true, firstInvalid = null;
@@ -582,6 +613,10 @@
       wrapEl.classList.toggle("invalid", invalid);
       if(invalid){ ok = false; if(!firstInvalid) firstInvalid = wrapEl; }
     });
+    var workersWrap = document.querySelector('[data-field="workers"]');
+    var anyWorkerChecked = workerCheckboxes.some(function(cb){ return cb && cb.checked; });
+    workersWrap.classList.toggle("invalid", !anyWorkerChecked);
+    if(!anyWorkerChecked){ ok = false; if(!firstInvalid) firstInvalid = workersWrap; }
     if(firstInvalid) firstInvalid.scrollIntoView({behavior:"smooth", block:"center"});
     return ok;
   }
@@ -596,7 +631,8 @@
     lines.push("Date: " + (data.jobDate || "-"));
     lines.push("Customer: " + (data.customer || "-"));
     lines.push("Job Code: " + (data.jobCode || "-"));
-    lines.push("Workers: " + (data.workers || "-"));
+    lines.push("Site Address: " + (data.siteAddress || "-"));
+    lines.push("Workers: " + (data.workers && data.workers.length ? data.workers.join(", ") : "-"));
     lines.push("");
     lines.push("Works Carried Out:");
     lines.push(data.worksCarried || "-");
@@ -612,7 +648,7 @@
     lines.push("Apprentice Hours ($45 p/h): " + data.hoursApprentice);
     lines.push("After Hours ($245 p/h): " + data.hoursAfter + " hrs = " + money(data.hoursAfter * 245));
     lines.push("");
-    lines.push("Estimated Total (excl. GST): " + money(totals.total) + "  (Labour " + money(totals.labour) + " + Materials " + money(totals.materials) + ")");
+    lines.push("Estimated Total (inc. GST): " + money(totals.total) + "  (Labour " + money(totals.labour) + " + Materials " + money(totals.materials) + ")");
     lines.push("");
     lines.push("Photos attached: " + photos.length);
     return lines.join("\n");
@@ -724,11 +760,18 @@
 
   $("copyEmailBtn").addEventListener("click", function(){ copyText(OFFICE_EMAIL); });
 
+  function summaryFileName(){
+    return "JobSheet_" + (currentData.jobCode || "job").replace(/[^a-z0-9_-]+/gi, "_") + ".txt";
+  }
+
   $("shareBtn").addEventListener("click", function(){
-    var files = photos.map(function(p){ return new File([p.blob], p.name, { type: "image/jpeg" }); });
+    var summaryFile = new File([currentSummary], summaryFileName(), { type: "text/plain" });
+    var photoFiles = photos.map(function(p){ return new File([p.blob], p.name, { type: "image/jpeg" }); });
+    var files = [summaryFile].concat(photoFiles);
+    var shortNote = "Job Sheet attached for " + (currentData.customer || "customer") + " (" + (currentData.jobCode || "-") + "). " + photos.length + " photo(s) attached.";
     var shareData = {
       title: "Job Sheet - " + (currentData.jobCode || "") + " - " + (currentData.customer || ""),
-      text: currentSummary,
+      text: shortNote,
       files: files
     };
     if(navigator.canShare && navigator.canShare({ files: files }) && navigator.share){
@@ -739,19 +782,32 @@
         if(err && err.name !== "AbortError") toast("Share cancelled or failed");
       });
     } else if(navigator.share){
+      // Fallback: this device/browser can't share files, only text — send the full summary as text so nothing is lost.
       navigator.share({ title: shareData.title, text: currentSummary }).then(function(){
         if(currentHistId) updateHistoryStatus(currentHistId, "Shared");
       }).catch(function(){});
     } else {
-      toast("Sharing not supported on this browser — use Download Photos + Open Email instead");
+      toast("Sharing not supported on this browser — use Download Job Sheet + Photos, then Open Email instead");
     }
   });
 
   $("mailtoBtn").addEventListener("click", function(){
     var subject = "Job Sheet - " + (currentData.jobCode || "") + " - " + (currentData.customer || "");
-    var body = currentSummary + (photos.length ? "\n\n(Please attach the " + photos.length + " photo(s) saved from this device — use \"Download Photos to Device\" if not already attached.)" : "");
+    var body = "Job sheet for " + (currentData.customer || "-") + " (" + (currentData.jobCode || "-") + ") is attached." +
+      "\n\n(This email app can't auto-attach files — please use \"Download Job Sheet\" and \"Download Photos to Device\" below first, then attach " +
+      (photos.length ? "those " + (photos.length + 1) + " files" : "that file") + " here before sending.)";
     var url = "mailto:" + encodeURIComponent(OFFICE_EMAIL) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
     window.location.href = url;
+  });
+
+  $("downloadSummaryBtn").addEventListener("click", function(){
+    var blob = new Blob([currentSummary], { type: "text/plain" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = summaryFileName();
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    toast("Job sheet downloaded");
   });
 
   $("downloadPhotosBtn").addEventListener("click", function(){
