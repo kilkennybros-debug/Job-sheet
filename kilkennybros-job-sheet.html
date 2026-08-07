@@ -76,11 +76,17 @@
   .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
   .photo-thumb .rm{position:absolute;top:4px;right:4px;background:rgba(20,20,20,.65);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:15px;line-height:1;cursor:pointer;}
   .photo-empty{font-size:13px;color:var(--muted);padding:14px 0;text-align:center;border:1.5px dashed var(--border);border-radius:8px;}
-  .total-box{display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:#fff;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
-  .total-box div span{display:block;}
+  .total-box{background:var(--navy);color:#fff;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
   .total-box .label{font-size:12px;color:#cfe0ee;text-transform:uppercase;letter-spacing:.04em;}
-  .total-box .amount{font-size:22px;font-weight:800;}
-  .total-box .breakdown{font-size:11px;color:#cfe0ee;margin-top:2px;}
+  .total-box .breakdown{font-size:11px;color:#cfe0ee;margin-top:8px;display:block;}
+  .total-row{display:flex;justify-content:space-between;align-items:baseline;}
+  .total-row .subamount{font-size:15px;font-weight:700;}
+  .total-row-main{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);}
+  .total-row-main .label{color:#fff;font-size:13px;font-weight:700;}
+  .total-row-main .amount{font-size:24px;font-weight:800;}
+  .inline-cost{margin-left:auto;position:relative;flex:0 0 auto;}
+  .inline-cost input{width:92px;padding:8px 8px 8px 22px;font-size:14px;border:1px solid var(--border);border-radius:6px;background:#fbfcfd;}
+  .inline-cost::before{content:"$";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
   .submitbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:20;}
   .submitbar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;}
   .radio-group{display:flex;flex-direction:column;gap:0;}
@@ -220,10 +226,12 @@
       <div class="checkrow">
         <input type="checkbox" id="mReline" value="Re-Lining">
         <label for="mReline">Re-Lining</label>
+        <span class="inline-cost"><input type="number" inputmode="decimal" step="0.01" id="relineCost" placeholder="0.00"></span>
       </div>
       <div class="checkrow">
         <input type="checkbox" id="mFlex" value="Flex Shaft">
         <label for="mFlex">Flex Shaft</label>
+        <span class="inline-cost"><input type="number" inputmode="decimal" step="0.01" id="flexCost" placeholder="0.00"></span>
       </div>
       <div class="checkrow">
         <input type="checkbox" id="mOther" value="Other">
@@ -232,10 +240,15 @@
       <div class="other-input" id="mOtherWrap">
         <input type="text" id="mOtherText" placeholder="Specify other machine used">
       </div>
+      <div class="hint">Re-Lining and Flex Shaft costs are entered by you and are excl. GST — they'll be added to the total below.</div>
     </div>
 
     <div class="card">
       <h2>Equipment / Services Used</h2>
+      <div class="checkrow">
+        <input type="checkbox" id="eqJetter" value="Jetter" data-cost="650">
+        <label for="eqJetter">Jetter — $650</label>
+      </div>
       <div class="checkrow">
         <input type="checkbox" id="eqCamera" value="Camera" data-cost="350">
         <label for="eqCamera">Camera — $350</label>
@@ -256,11 +269,11 @@
         <input type="checkbox" id="eqLeak" value="Leak Detection - Subcontractor" data-cost="0">
         <label for="eqLeak">Leak Detection — Subcontractor</label>
       </div>
-      <div class="hint">Subcontractor items have no fixed price and are not included in the auto-calculated total — invoice separately.</div>
+      <div class="hint">Prices shown are excl. GST. Subcontractor items have no fixed price and are not included in the auto-calculated total — invoice separately.</div>
     </div>
 
     <div class="card">
-      <h2>Costs</h2>
+      <h2>Costs <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;color:var(--muted);">(all amounts excl. GST)</span></h2>
       <div class="field money">
         <label>Purchased — Material Cost</label>
         <input type="number" inputmode="decimal" step="0.01" id="costPurchased" placeholder="0.00">
@@ -269,33 +282,37 @@
         <label>Stock on Hand — Material Cost</label>
         <input type="number" inputmode="decimal" step="0.01" id="costStock" placeholder="0.00">
       </div>
-      <div class="field money">
-        <label>Re-lining &amp; Flex Shaft Cost</label>
-        <input type="number" inputmode="decimal" step="0.01" id="costReline" placeholder="0.00">
-      </div>
       <div class="row2">
         <div class="field">
-          <label>Hours ($110 p/h)</label>
+          <label>Hours ($110 p/h excl. GST)</label>
           <input type="number" inputmode="decimal" step="0.25" id="hoursNormal" placeholder="0">
         </div>
         <div class="field">
-          <label>Apprentice Hours ($45 p/h)</label>
+          <label>Apprentice Hours ($45 p/h excl. GST)</label>
           <input type="number" inputmode="decimal" step="0.25" id="hoursApprentice" placeholder="0">
         </div>
       </div>
       <div class="field">
-        <label>After Hours ($245 p/h)</label>
+        <label>After Hours ($245 p/h excl. GST)</label>
         <input type="number" inputmode="decimal" step="0.25" id="hoursAfter" placeholder="0">
         <div class="hint" id="afterHoursCostHint">Cost: $0.00</div>
       </div>
     </div>
 
     <div class="total-box">
-      <div>
-        <span class="label">Estimated Total (inc. GST)</span>
-        <span class="amount" id="totalAmount">$0.00</span>
-        <span class="breakdown" id="totalBreakdown">Labour $0.00 + Materials $0.00</span>
+      <div class="total-row">
+        <span class="label">Subtotal (excl. GST)</span>
+        <span class="subamount" id="subtotalExGST">$0.00</span>
       </div>
+      <div class="total-row">
+        <span class="label">GST (10%)</span>
+        <span class="subamount" id="gstAmount">$0.00</span>
+      </div>
+      <div class="total-row total-row-main">
+        <span class="label">Total (inc. GST)</span>
+        <span class="amount" id="totalAmount">$0.00</span>
+      </div>
+      <span class="breakdown" id="totalBreakdown">Labour $0.00 + Materials $0.00 (excl. GST)</span>
     </div>
 
   </form>
@@ -362,11 +379,12 @@
     worksCarried: $("worksCarried"),
     wTim: $("wTim"), wDaniel: $("wDaniel"), wApprentice: $("wApprentice"), wSubcontractor: $("wSubcontractor"),
     mReline: $("mReline"), mFlex: $("mFlex"), mOther: $("mOther"), mOtherText: $("mOtherText"),
-    eqCamera: $("eqCamera"), eqSewer: $("eqSewer"), eqDemo: $("eqDemo"), eqExcavation: $("eqExcavation"), eqLeak: $("eqLeak"),
-    costPurchased: $("costPurchased"), costStock: $("costStock"), costReline: $("costReline"),
+    relineCost: $("relineCost"), flexCost: $("flexCost"),
+    eqJetter: $("eqJetter"), eqCamera: $("eqCamera"), eqSewer: $("eqSewer"), eqDemo: $("eqDemo"), eqExcavation: $("eqExcavation"), eqLeak: $("eqLeak"),
+    costPurchased: $("costPurchased"), costStock: $("costStock"),
     hoursNormal: $("hoursNormal"), hoursApprentice: $("hoursApprentice"), hoursAfter: $("hoursAfter")
   };
-  var equipmentCheckboxes = [fields.eqCamera, fields.eqSewer, fields.eqDemo, fields.eqExcavation, fields.eqLeak];
+  var equipmentCheckboxes = [fields.eqJetter, fields.eqCamera, fields.eqSewer, fields.eqDemo, fields.eqExcavation, fields.eqLeak];
   var workerCheckboxes = [fields.wTim, fields.wDaniel, fields.wApprentice, fields.wSubcontractor];
 
   // ---------- init ----------
@@ -413,16 +431,23 @@
       return sum;
     }, 0);
   }
+  var GST_RATE = 0.10;
   function recalcTotal(){
     var afterHoursCost = num(fields.hoursAfter.value) * 245;
-    $("afterHoursCostHint").textContent = "Cost: " + money(afterHoursCost);
+    $("afterHoursCostHint").textContent = "Cost: " + money(afterHoursCost) + " (excl. GST)";
     var labour = num(fields.hoursNormal.value)*110 + num(fields.hoursApprentice.value)*45 + afterHoursCost;
     var eqCost = equipmentCost();
-    var materials = num(fields.costPurchased.value) + num(fields.costStock.value) + num(fields.costReline.value) + eqCost;
-    var total = labour + materials;
+    var relineCost = num(fields.relineCost.value);
+    var flexCost = num(fields.flexCost.value);
+    var materials = num(fields.costPurchased.value) + num(fields.costStock.value) + relineCost + flexCost + eqCost;
+    var subtotalExGST = labour + materials;
+    var gst = subtotalExGST * GST_RATE;
+    var total = subtotalExGST + gst;
+    $("subtotalExGST").textContent = money(subtotalExGST);
+    $("gstAmount").textContent = money(gst);
     $("totalAmount").textContent = money(total);
-    $("totalBreakdown").textContent = "Labour " + money(labour) + " + Materials " + money(materials);
-    return { labour: labour, materials: materials, equipmentCost: eqCost, total: total };
+    $("totalBreakdown").textContent = "Labour " + money(labour) + " + Materials " + money(materials) + " (excl. GST)";
+    return { labour: labour, materials: materials, equipmentCost: eqCost, relineCost: relineCost, flexCost: flexCost, subtotalExGST: subtotalExGST, gst: gst, total: total };
   }
   Object.keys(fields).forEach(function(k){
     var el = fields[k];
@@ -460,7 +485,8 @@
       equipment: equipment,
       costPurchased: num(fields.costPurchased.value),
       costStock: num(fields.costStock.value),
-      costReline: num(fields.costReline.value),
+      relineCost: num(fields.relineCost.value),
+      flexCost: num(fields.flexCost.value),
       hoursNormal: num(fields.hoursNormal.value),
       hoursApprentice: num(fields.hoursApprentice.value),
       hoursAfter: num(fields.hoursAfter.value),
@@ -495,7 +521,8 @@
     });
     fields.costPurchased.value = data.costPurchased || "";
     fields.costStock.value = data.costStock || "";
-    fields.costReline.value = data.costReline || "";
+    fields.relineCost.value = data.relineCost || "";
+    fields.flexCost.value = data.flexCost || "";
     fields.hoursNormal.value = data.hoursNormal || "";
     fields.hoursApprentice.value = data.hoursApprentice || "";
     fields.hoursAfter.value = data.hoursAfter || "";
@@ -640,15 +667,19 @@
     lines.push("Machines Used: " + (data.machines.length ? data.machines.join(", ") : "-"));
     lines.push("Equipment / Services Used: " + (data.equipment.length ? data.equipment.join(", ") : "-"));
     lines.push("");
+    lines.push("(All amounts below are excl. GST unless stated)");
     lines.push("Purchased - Material Cost: " + money(data.costPurchased));
     lines.push("Stock on Hand - Material Cost: " + money(data.costStock));
-    lines.push("Re-lining & Flex Shaft Cost: " + money(data.costReline));
+    lines.push("Re-Lining Cost: " + money(data.relineCost));
+    lines.push("Flex Shaft Cost: " + money(data.flexCost));
     lines.push("Equipment Cost: " + money(totals.equipmentCost));
     lines.push("Hours ($110 p/h): " + data.hoursNormal);
     lines.push("Apprentice Hours ($45 p/h): " + data.hoursApprentice);
     lines.push("After Hours ($245 p/h): " + data.hoursAfter + " hrs = " + money(data.hoursAfter * 245));
     lines.push("");
-    lines.push("Estimated Total (inc. GST): " + money(totals.total) + "  (Labour " + money(totals.labour) + " + Materials " + money(totals.materials) + ")");
+    lines.push("Subtotal (excl. GST): " + money(totals.subtotalExGST) + "  (Labour " + money(totals.labour) + " + Materials " + money(totals.materials) + ")");
+    lines.push("GST (10%): " + money(totals.gst));
+    lines.push("Total (inc. GST): " + money(totals.total));
     lines.push("");
     lines.push("Photos attached: " + photos.length);
     return lines.join("\n");
