@@ -355,26 +355,20 @@
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#1f8a4c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <h2 style="margin:0 0 4px;font-size:19px;">Job Sheet Ready</h2>
-    <p style="margin:0;color:var(--muted);font-size:13.5px;" id="confirmSubtitle">Saved on this device. Now send it to the office:</p>
-
-    <div class="email-pill">
-      <span>kilkennybros@bigpond.com</span>
-      <button class="copybtn" id="copyEmailBtn">Copy</button>
-    </div>
+    <p style="margin:0;color:var(--muted);font-size:13.5px;" id="confirmSubtitle">Saved on this device and uploading to the office automatically.</p>
 
     <div class="note" id="pdfStatus" style="display:none;">Preparing PDF job sheet…</div>
     <div class="note" id="syncStatus" style="display:none;"></div>
 
     <div class="stack">
       <button class="btn btn-primary btn-full" id="shareBtn">Share Job Sheet (PDF)</button>
-      <button class="btn btn-navy btn-full" id="mailtoBtn">Open Email (pre-filled)</button>
       <button class="btn btn-ghost btn-full" id="downloadSummaryBtn">Download Job Sheet (PDF)</button>
       <button class="btn btn-ghost btn-full" id="downloadPhotosBtn">Download Photos to Device</button>
       <button class="btn btn-ghost btn-full" id="newJobBtn">Start New Job Sheet</button>
     </div>
 
     <div class="note" id="shareNote">
-      This job sheet uploads to the office automatically in the background — you don't need to do anything else. If you're out of signal it'll keep trying and send as soon as you're back online. The buttons above are just a backup: <strong>Share Job Sheet (PDF)</strong> opens your phone's share sheet to send it another way, and <strong>Download Job Sheet (PDF)</strong> saves a copy to this device.
+      This job sheet uploads to the office automatically in the background — you don't need to do anything else. If you're out of signal it'll keep trying and send as soon as you're back online. The buttons above are just a backup: <strong>Share Job Sheet (PDF)</strong> opens your device's share sheet to send it another way, and <strong>Download Job Sheet (PDF)</strong> saves a copy to this device.
     </div>
   </div>
 </div>
@@ -1707,7 +1701,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     currentSummary = summary; currentData = data; currentTotals = totals; currentPdfBlob = null;
     currentHistId = addHistoryEntry(data, totals, summary, "Saved");
     try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
-    copyText(OFFICE_EMAIL);
     showConfirm();
     setSendButtonsEnabled(false);
     var pdfStatusEl = $("pdfStatus");
@@ -1735,8 +1728,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     tabHistBtn.classList.remove("active");
   }
 
-  $("copyEmailBtn").addEventListener("click", function(){ copyText(OFFICE_EMAIL); });
-
   function summaryFileName(){
     return "JobSheet_" + (currentData.jobCode || "job").replace(/[^a-z0-9_-]+/gi, "_") + ".txt";
   }
@@ -1755,7 +1746,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
           toast("Shared");
         }).catch(function(err){ if(err && err.name !== "AbortError") toast("Share cancelled or failed"); });
       } else {
-        toast("Sharing not supported on this browser — use Download Job Sheet, then Open Email instead");
+        toast("Sharing not supported on this browser — use Download Job Sheet instead");
       }
       return;
     }
@@ -1775,16 +1766,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     } else if(navigator.share){
       navigator.share({ title: shareData.title, text: currentSummary }).then(function(){}).catch(function(){});
     } else {
-      toast("Sharing not supported on this browser — use Download Job Sheet (PDF), then Open Email instead");
+      toast("Sharing not supported on this browser — use Download Job Sheet (PDF) instead");
     }
-  });
-
-  $("mailtoBtn").addEventListener("click", function(){
-    var subject = "Job Sheet - " + (currentData.jobCode || "") + " - " + (currentData.customer || "");
-    var body = "Job sheet for " + (currentData.customer || "-") + " (" + (currentData.jobCode || "-") + ") is attached." +
-      "\n\n(This email app can't auto-attach files — please use \"Download Job Sheet (PDF)\" below first, then attach that file here before sending.)";
-    var url = "mailto:" + encodeURIComponent(OFFICE_EMAIL) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    window.location.href = url;
   });
 
   $("downloadSummaryBtn").addEventListener("click", function(){
