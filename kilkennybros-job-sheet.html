@@ -1,873 +1,194 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0b3d63">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>KilkennyBros Plumbing — Job Sheet</title>
-<style>
-  :root{
-    --navy:#0b3d63;
-    --navy-dark:#082c48;
-    --orange:#f28c28;
-    --orange-dark:#d9761a;
-    --bg:#eef2f5;
-    --card:#ffffff;
-    --text:#1c2b36;
-    --muted:#5c6b76;
-    --border:#d7dee3;
-    --red:#c0392b;
-    --green:#1f8a4c;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:110px;}
-  header{background:var(--navy);color:#fff;padding:16px 18px;position:sticky;top:0;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.15);}
-  header .brand{display:flex;align-items:center;gap:10px;}
-  header .brand svg{flex:0 0 auto;}
-  header h1{font-size:18px;margin:0;line-height:1.2;}
-  header p{margin:2px 0 0;font-size:12px;color:#cfe0ee;}
-  nav.tabs{display:flex;gap:0;background:var(--navy-dark);}
-  nav.tabs button{flex:1;padding:10px 6px;background:none;border:none;color:#cfe0ee;font-size:13px;font-weight:600;border-bottom:3px solid transparent;}
-  nav.tabs button.active{color:#fff;border-bottom-color:var(--orange);}
-  main{max-width:640px;margin:0 auto;padding:14px;}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
-  .card h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-  label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;}
-  .req::after{content:" *";color:var(--red);}
-  .field{margin-bottom:14px;}
-  .field:last-child{margin-bottom:0;}
-  input[type=text],input[type=number],input[type=date],textarea,select{
-    width:100%;padding:11px 12px;font-size:16px;border:1px solid var(--border);border-radius:8px;background:#fbfcfd;color:var(--text);
-  }
-  textarea{min-height:90px;resize:vertical;font-family:inherit;}
-  select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235c6b76'><path d='M7 10l5 5 5-5z'/></svg>");background-repeat:no-repeat;background-position:right 10px center;background-size:20px;padding-right:34px;}
-  .hint{font-size:12px;color:var(--muted);margin-top:4px;}
-  .error{font-size:12px;color:var(--red);margin-top:4px;display:none;}
-  .field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--red);background:#fdf2f1;}
-  .field.invalid .error{display:block;}
-  .money{position:relative;}
-  .money::before{content:"$";position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;}
-  .money input{padding-left:26px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .checkrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f2f4;}
-  .checkrow:last-child{border-bottom:none;}
-  .checkrow input[type=checkbox]{width:20px;height:20px;flex:0 0 auto;}
-  .checkrow label{margin:0;font-weight:500;font-size:15px;}
-  .other-input{margin-top:8px;display:none;}
-  .other-input.show{display:block;}
-  .photo-buttons{display:flex;gap:10px;margin-bottom:12px;}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;font-size:14px;font-weight:700;border-radius:8px;border:none;cursor:pointer;text-decoration:none;}
-  .btn-outline{background:#fff;border:1.5px solid var(--navy);color:var(--navy);flex:1;}
-  .btn-primary{background:var(--orange);color:#fff;flex:1;}
-  .btn-primary:active{background:var(--orange-dark);}
-  .btn-navy{background:var(--navy);color:#fff;}
-  .btn-navy:active{background:var(--navy-dark);}
-  .btn-full{width:100%;}
-  .btn-ghost{background:none;color:var(--navy);border:1px solid var(--border);}
-  .btn-danger{background:none;color:var(--red);border:1px solid #f0c4c0;}
-  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .photo-thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1/1;background:#eee;border:1px solid var(--border);}
-  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .photo-thumb .rm{position:absolute;top:4px;right:4px;background:rgba(20,20,20,.65);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:15px;line-height:1;cursor:pointer;}
-  .photo-empty{font-size:13px;color:var(--muted);padding:14px 0;text-align:center;border:1.5px dashed var(--border);border-radius:8px;}
-  .total-box{background:var(--navy);color:#fff;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
-  .total-box .label{font-size:12px;color:#cfe0ee;text-transform:uppercase;letter-spacing:.04em;}
-  .total-box .breakdown{font-size:11px;color:#cfe0ee;margin-top:8px;display:block;}
-  .total-row{display:flex;justify-content:space-between;align-items:baseline;}
-  .total-row .subamount{font-size:15px;font-weight:700;}
-  .total-row-main{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);}
-  .total-row-main .label{color:#fff;font-size:13px;font-weight:700;}
-  .total-row-main .amount{font-size:24px;font-weight:800;}
-  .inline-cost{margin-left:auto;position:relative;flex:0 0 auto;}
-  .inline-cost input{width:92px;padding:8px 8px 8px 22px;font-size:14px;border:1px solid var(--border);border-radius:6px;background:#fbfcfd;}
-  .inline-cost::before{content:"$";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
-  .submitbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:20;}
-  .submitbar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;}
-  .radio-group{display:flex;flex-direction:column;gap:0;}
-  /* confirmation */
-  .confirm-wrap{max-width:640px;margin:0 auto;padding:14px;}
-  .confirm-card{background:#fff;border-radius:10px;padding:22px 18px;text-align:center;border:1px solid var(--border);}
-  .check-circle{width:56px;height:56px;border-radius:50%;background:#e6f6ec;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
-  .email-pill{display:flex;align-items:center;justify-content:space-between;background:#f4f7f9;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:14px 0;}
-  .email-pill span{font-weight:700;color:var(--navy);font-size:15px;word-break:break-all;text-align:left;}
-  .copybtn{flex:0 0 auto;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:12px;font-weight:700;margin-left:10px;}
-  .stack{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
-  .note{font-size:12.5px;color:var(--muted);text-align:left;background:#fbf7ee;border:1px solid #eee0bf;border-radius:8px;padding:10px 12px;margin-top:14px;line-height:1.5;}
-  /* history */
-  .hist-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
-  .hist-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-  .hist-top strong{font-size:15px;}
-  .hist-meta{font-size:12px;color:var(--muted);margin-top:2px;}
-  .status-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
-  .status-shared{background:#e6f6ec;color:var(--green);}
-  .status-saved{background:#fdf2e3;color:var(--orange-dark);}
-  .hist-actions{display:flex;gap:8px;margin-top:10px;}
-  .hist-actions button{flex:1;padding:8px;font-size:12.5px;border-radius:6px;border:1px solid var(--border);background:#fafbfc;}
-  .empty-state{text-align:center;color:var(--muted);font-size:13.5px;padding:40px 20px;}
-  .hidden{display:none !important;}
-  .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#1c2b36;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;}
-  .toast.show{opacity:1;}
-  .resume-banner{background:#fdf2e3;border:1px solid #eee0bf;color:#7a5416;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  .resume-banner button{border:none;background:var(--navy);color:#fff;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;flex:0 0 auto;}
-  .resume-banner button.secondary{background:transparent;color:var(--navy);text-decoration:underline;padding:7px 4px;}
-</style>
-</head>
-<body>
+/**
+ * KilkennyBros Plumbing — Job Sheet submission backend.
+ *
+ * HOW THIS WORKS
+ * The job sheet app (on Tim's and Daniel's iPads, and yours) sends each
+ * completed job sheet here as soon as "Complete & Prepare Job Sheet" is
+ * tapped and there's a signal. This script:
+ *   1. Saves the attached PDF into the "Submitted PDFs" Drive folder.
+ *   2. Adds a row to this spreadsheet with the job details + a link to the PDF.
+ *   3. Emails kilkennybros@bigpond.com to say a new job sheet has arrived.
+ *
+ * Everyone logged into the same Google account sees the same spreadsheet —
+ * that's the shared "inbox". Tick the "Invoiced" box in column B once
+ * you've invoiced a job, so the whole team can see what has and hasn't
+ * been invoiced yet.
+ * The app's own "Team" tab also reads from here (via doGet) and can tick
+ * "Invoiced" for you (via doPost) without anyone opening the spreadsheet.
+ *
+ * SETUP (one-off, see the deployment instructions sent with this file):
+ *   1. Open the "KilkennyBros Job Sheets - Submissions" spreadsheet.
+ *   2. Extensions > Apps Script, delete the placeholder code, paste this
+ *      whole file in, Save.
+ *   3. Run the "setupSheet" function once (see the dropdown next to the
+ *      Run button) to format the header row and tick-boxes.
+ *   4. Deploy > New deployment > Web app > Execute as: Me,
+ *      Who has access: Anyone > Deploy.
+ *   5. Copy the Web app URL it gives you and send it back so it can be
+ *      wired into the job sheet app.
+ */
 
-<header>
-  <div class="brand">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14.7 6.3a1 1 0 0 0-1.4 0l-1.6 1.6-1.6-1.6a3 3 0 0 0-4.2 4.2l1.6 1.6-5 5a1.5 1.5 0 0 0 2.1 2.1l5-5 1.6 1.6a3 3 0 0 0 4.2-4.2l-1.6-1.6 1.6-1.6a1 1 0 0 0 0-1.4l-.7-.7z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
-    </svg>
-    <div>
-      <h1>KilkennyBros Plumbing</h1>
-      <p>On-site Job Sheet</p>
-    </div>
-  </div>
-</header>
+// ---- configuration -------------------------------------------------------
 
-<nav class="tabs">
-  <button id="tabFormBtn" class="active">Job Sheet</button>
-  <button id="tabHistBtn">Saved / Sent (<span id="histCount">0</span>)</button>
-</nav>
+var PDF_FOLDER_ID = "1CrkkgXlNzTuA8PyH6c8AVbAXWfVAoKUJ"; // "Submitted PDFs" folder
+var NOTIFY_EMAIL = "kilkennybros@bigpond.com";
+// Lightweight shared secret so random internet traffic can't spam the sheet.
+// This must match SYNC_TOKEN in the job sheet app's HTML file exactly.
+var SHARED_SECRET = "5Pyu7ExXCgw3gvle95-fF9-r6L4W-RUq";
 
-<main id="formView">
-  <div id="resumeBanner" class="resume-banner hidden">
-    <span>You have an unfinished job sheet. Resume it?</span>
-    <div style="display:flex;gap:6px;">
-      <button id="resumeYes">Resume</button>
-      <button id="resumeNo" class="secondary">Discard</button>
-    </div>
-  </div>
+// ---------------------------------------------------------------------------
 
-  <form id="jobForm" novalidate>
-
-    <div class="card">
-      <h2>Job Details</h2>
-      <div class="field" data-field="jobType">
-        <label class="req">Type</label>
-        <select id="jobType">
-          <option value="">Select...</option>
-          <option value="INVOICE">Invoice</option>
-          <option value="QUOTE">Quote</option>
-          <option value="ALREADY QUOTED IN XERO">Already Quoted in Xero</option>
-        </select>
-        <div class="error">Please select a job type.</div>
-      </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="jobDate">
-      </div>
-      <div class="field" data-field="customer">
-        <label class="req">Customer</label>
-        <input type="text" id="customer" placeholder="Customer name">
-        <div class="error">Please enter the customer name.</div>
-      </div>
-      <div class="field" data-field="jobCode">
-        <label class="req">Job Code</label>
-        <input type="text" id="jobCode" placeholder="Job code">
-        <div class="error">Please enter the job code.</div>
-      </div>
-      <div class="field">
-        <label>Site Address</label>
-        <input type="text" id="siteAddress" placeholder="Site address">
-      </div>
-      <div class="field" data-field="workers">
-        <label class="req">Workers</label>
-        <div class="checkrow">
-          <input type="checkbox" id="wTim" value="Tim">
-          <label for="wTim">Tim</label>
-        </div>
-        <div class="checkrow">
-          <input type="checkbox" id="wDaniel" value="Daniel">
-          <label for="wDaniel">Daniel</label>
-        </div>
-        <div class="checkrow">
-          <input type="checkbox" id="wApprentice" value="Apprentice">
-          <label for="wApprentice">Apprentice</label>
-        </div>
-        <div class="checkrow">
-          <input type="checkbox" id="wSubcontractor" value="Subcontractor">
-          <label for="wSubcontractor">Subcontractor</label>
-        </div>
-        <div class="error">Please select at least one worker on this job.</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Works Carried Out</h2>
-      <div class="field">
-        <label>Description</label>
-        <textarea id="worksCarried" placeholder="Describe the work completed..."></textarea>
-        <div class="hint">Please attach any material dockets as photos below.</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Material Dockets / Photos</h2>
-      <div class="photo-buttons">
-        <button type="button" class="btn btn-outline" id="btnTakePhoto">Take Photo</button>
-        <button type="button" class="btn btn-outline" id="btnAddGallery">Add from Gallery</button>
-      </div>
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
-      <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
-      <div id="photoGrid" class="photo-grid"></div>
-      <div id="photoEmpty" class="photo-empty">No photos attached yet</div>
-    </div>
-
-    <div class="card">
-      <h2>Machines Used</h2>
-      <div class="checkrow">
-        <input type="checkbox" id="mReline" value="Re-Lining">
-        <label for="mReline">Re-Lining</label>
-        <span class="inline-cost"><input type="number" inputmode="decimal" step="0.01" id="relineCost" placeholder="0.00"></span>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="mFlex" value="Flex Shaft">
-        <label for="mFlex">Flex Shaft</label>
-        <span class="inline-cost"><input type="number" inputmode="decimal" step="0.01" id="flexCost" placeholder="0.00"></span>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="mOther" value="Other">
-        <label for="mOther">Other</label>
-      </div>
-      <div class="other-input" id="mOtherWrap">
-        <input type="text" id="mOtherText" placeholder="Specify other machine used">
-      </div>
-      <div class="hint">Re-Lining and Flex Shaft costs are entered by you and are excl. GST — they'll be added to the total below.</div>
-    </div>
-
-    <div class="card">
-      <h2>Equipment / Services Used</h2>
-      <div class="checkrow">
-        <input type="checkbox" id="eqJetter" value="Jetter" data-cost="650">
-        <label for="eqJetter">Jetter — $650</label>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="eqCamera" value="Camera" data-cost="350">
-        <label for="eqCamera">Camera — $350</label>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="eqSewer" value="Sewer Machine" data-cost="140">
-        <label for="eqSewer">Sewer Machine — $140</label>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="eqDemo" value="Demo Saw" data-cost="130">
-        <label for="eqDemo">Demo Saw — $130</label>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="eqExcavation" value="Excavation - Subcontractor" data-cost="0">
-        <label for="eqExcavation">Excavation — Subcontractor</label>
-      </div>
-      <div class="checkrow">
-        <input type="checkbox" id="eqLeak" value="Leak Detection - Subcontractor" data-cost="0">
-        <label for="eqLeak">Leak Detection — Subcontractor</label>
-      </div>
-      <div class="hint">Prices shown are excl. GST. Subcontractor items have no fixed price and are not included in the auto-calculated total — invoice separately.</div>
-    </div>
-
-    <div class="card">
-      <h2>Costs <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;color:var(--muted);">(all amounts excl. GST)</span></h2>
-      <div class="field money">
-        <label>Purchased — Material Cost</label>
-        <input type="number" inputmode="decimal" step="0.01" id="costPurchased" placeholder="0.00">
-      </div>
-      <div class="field money">
-        <label>Stock on Hand — Material Cost</label>
-        <input type="number" inputmode="decimal" step="0.01" id="costStock" placeholder="0.00">
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>Hours ($110 p/h excl. GST)</label>
-          <input type="number" inputmode="decimal" step="0.25" id="hoursNormal" placeholder="0">
-        </div>
-        <div class="field">
-          <label>Apprentice Hours ($45 p/h excl. GST)</label>
-          <input type="number" inputmode="decimal" step="0.25" id="hoursApprentice" placeholder="0">
-        </div>
-      </div>
-      <div class="field">
-        <label>After Hours ($245 p/h excl. GST)</label>
-        <input type="number" inputmode="decimal" step="0.25" id="hoursAfter" placeholder="0">
-        <div class="hint" id="afterHoursCostHint">Cost: $0.00</div>
-      </div>
-    </div>
-
-    <div class="total-box">
-      <div class="total-row">
-        <span class="label">Subtotal (excl. GST)</span>
-        <span class="subamount" id="subtotalExGST">$0.00</span>
-      </div>
-      <div class="total-row">
-        <span class="label">GST (10%)</span>
-        <span class="subamount" id="gstAmount">$0.00</span>
-      </div>
-      <div class="total-row total-row-main">
-        <span class="label">Total (inc. GST)</span>
-        <span class="amount" id="totalAmount">$0.00</span>
-      </div>
-      <span class="breakdown" id="totalBreakdown">Labour $0.00 + Materials $0.00 (excl. GST)</span>
-    </div>
-
-  </form>
-</main>
-
-<div id="confirmView" class="confirm-wrap hidden">
-  <div class="confirm-card">
-    <div class="check-circle">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#1f8a4c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <h2 style="margin:0 0 4px;font-size:19px;">Job Sheet Ready</h2>
-    <p style="margin:0;color:var(--muted);font-size:13.5px;" id="confirmSubtitle">Saved on this device. Now send it to the office:</p>
-
-    <div class="email-pill">
-      <span>kilkennybros@bigpond.com</span>
-      <button class="copybtn" id="copyEmailBtn">Copy</button>
-    </div>
-
-    <div class="stack">
-      <button class="btn btn-primary btn-full" id="shareBtn">Share Job Sheet + Photos</button>
-      <button class="btn btn-navy btn-full" id="mailtoBtn">Open Email (pre-filled)</button>
-      <button class="btn btn-ghost btn-full" id="downloadSummaryBtn">Download Job Sheet</button>
-      <button class="btn btn-ghost btn-full" id="downloadPhotosBtn">Download Photos to Device</button>
-      <button class="btn btn-ghost btn-full" id="newJobBtn">Start New Job Sheet</button>
-    </div>
-
-    <div class="note" id="shareNote">
-      Tap <strong>Share Job Sheet + Photos</strong> to open your phone's share sheet and send everything as file attachments (not pasted into the email text) straight from Mail, Gmail, or Messages. Your mail app may not auto-fill the "To" field — the office email is copied to your clipboard, just paste it in. If sharing isn't available, use <strong>Download Job Sheet</strong> and <strong>Download Photos</strong> first, then attach them manually in your email app.
-    </div>
-  </div>
-</div>
-
-<div id="histView" class="confirm-wrap hidden">
-  <div id="histList"></div>
-</div>
-
-<div class="submitbar" id="submitBar">
-  <div class="submitbar-inner">
-    <button type="button" class="btn btn-primary btn-full" id="submitBtn">Complete &amp; Prepare Job Sheet</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-(function(){
-  "use strict";
-
-  var DRAFT_KEY = "kbp_draft_v1";
-  var HISTORY_KEY = "kbp_history_v1";
-  var OFFICE_EMAIL = "kilkennybros@bigpond.com";
-
-  var photos = []; // {id, blob, url, name}
-  var photoIdSeq = 1;
-
-  // ---------- element refs ----------
-  var $ = function(id){ return document.getElementById(id); };
-  var formView = $("formView"), confirmView = $("confirmView"), histView = $("histView");
-  var tabFormBtn = $("tabFormBtn"), tabHistBtn = $("tabHistBtn"), submitBar = $("submitBar");
-
-  var fields = {
-    jobType: $("jobType"), jobDate: $("jobDate"), customer: $("customer"), jobCode: $("jobCode"),
-    siteAddress: $("siteAddress"),
-    worksCarried: $("worksCarried"),
-    wTim: $("wTim"), wDaniel: $("wDaniel"), wApprentice: $("wApprentice"), wSubcontractor: $("wSubcontractor"),
-    mReline: $("mReline"), mFlex: $("mFlex"), mOther: $("mOther"), mOtherText: $("mOtherText"),
-    relineCost: $("relineCost"), flexCost: $("flexCost"),
-    eqJetter: $("eqJetter"), eqCamera: $("eqCamera"), eqSewer: $("eqSewer"), eqDemo: $("eqDemo"), eqExcavation: $("eqExcavation"), eqLeak: $("eqLeak"),
-    costPurchased: $("costPurchased"), costStock: $("costStock"),
-    hoursNormal: $("hoursNormal"), hoursApprentice: $("hoursApprentice"), hoursAfter: $("hoursAfter")
-  };
-  var equipmentCheckboxes = [fields.eqJetter, fields.eqCamera, fields.eqSewer, fields.eqDemo, fields.eqExcavation, fields.eqLeak];
-  var workerCheckboxes = [fields.wTim, fields.wDaniel, fields.wApprentice, fields.wSubcontractor];
-
-  // ---------- init ----------
-  if(!fields.jobDate.value){
-    var d = new Date();
-    fields.jobDate.value = d.toISOString().slice(0,10);
-  }
-
-  // ---------- tabs ----------
-  function showTab(name){
-    formView.classList.toggle("hidden", name!=="form");
-    histView.classList.toggle("hidden", name!=="hist");
-    confirmView.classList.add("hidden");
-    submitBar.classList.toggle("hidden", name!=="form");
-    tabFormBtn.classList.toggle("active", name==="form");
-    tabHistBtn.classList.toggle("active", name==="hist");
-    if(name==="hist") renderHistory();
-  }
-  tabFormBtn.addEventListener("click", function(){ showTab("form"); });
-  tabHistBtn.addEventListener("click", function(){ showTab("hist"); });
-
-  // ---------- toast ----------
-  var toastTimer;
-  function toast(msg){
-    var t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
-  }
-
-  // ---------- Other machine toggle ----------
-  fields.mOther.addEventListener("change", function(){
-    $("mOtherWrap").classList.toggle("show", fields.mOther.checked);
-    if(!fields.mOther.checked) fields.mOtherText.value = "";
-  });
-
-  // ---------- totals ----------
-  function num(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; }
-  function money(n){ return "$" + n.toFixed(2); }
-  function equipmentCost(){
-    return equipmentCheckboxes.reduce(function(sum, cb){
-      if(cb && cb.checked) return sum + num(cb.getAttribute("data-cost"));
-      return sum;
-    }, 0);
-  }
-  var GST_RATE = 0.10;
-  function recalcTotal(){
-    var afterHoursCost = num(fields.hoursAfter.value) * 245;
-    $("afterHoursCostHint").textContent = "Cost: " + money(afterHoursCost) + " (excl. GST)";
-    var labour = num(fields.hoursNormal.value)*110 + num(fields.hoursApprentice.value)*45 + afterHoursCost;
-    var eqCost = equipmentCost();
-    var relineCost = num(fields.relineCost.value);
-    var flexCost = num(fields.flexCost.value);
-    var materials = num(fields.costPurchased.value) + num(fields.costStock.value) + relineCost + flexCost + eqCost;
-    var subtotalExGST = labour + materials;
-    var gst = subtotalExGST * GST_RATE;
-    var total = subtotalExGST + gst;
-    $("subtotalExGST").textContent = money(subtotalExGST);
-    $("gstAmount").textContent = money(gst);
-    $("totalAmount").textContent = money(total);
-    $("totalBreakdown").textContent = "Labour " + money(labour) + " + Materials " + money(materials) + " (excl. GST)";
-    return { labour: labour, materials: materials, equipmentCost: eqCost, relineCost: relineCost, flexCost: flexCost, subtotalExGST: subtotalExGST, gst: gst, total: total };
-  }
-  Object.keys(fields).forEach(function(k){
-    var el = fields[k];
-    if(!el) return;
-    var onFieldUpdate = function(){ recalcTotal(); saveDraft(); };
-    el.addEventListener("input", onFieldUpdate);
-    el.addEventListener("change", onFieldUpdate);
-    // iOS Safari doesn't always fire "input" for number fields while typing on the
-    // numeric keypad — keyup/blur give a reliable fallback so totals still update live.
-    el.addEventListener("keyup", onFieldUpdate);
-    el.addEventListener("blur", onFieldUpdate);
-  });
-  recalcTotal();
-
-  // ---------- draft autosave ----------
-  function collectFormData(){
-    var machines = [];
-    if(fields.mReline.checked) machines.push("Re-Lining");
-    if(fields.mFlex.checked) machines.push("Flex Shaft");
-    if(fields.mOther.checked) machines.push("Other" + (fields.mOtherText.value.trim() ? " (" + fields.mOtherText.value.trim() + ")" : ""));
-    var equipment = equipmentCheckboxes.filter(function(cb){ return cb && cb.checked; }).map(function(cb){
-      var cost = num(cb.getAttribute("data-cost"));
-      return cost > 0 ? (cb.value + " ($" + cost.toFixed(2) + ")") : cb.value;
-    });
-    var workers = workerCheckboxes.filter(function(cb){ return cb && cb.checked; }).map(function(cb){ return cb.value; });
-    return {
-      jobType: fields.jobType.value,
-      jobDate: fields.jobDate.value,
-      customer: fields.customer.value.trim(),
-      jobCode: fields.jobCode.value.trim(),
-      siteAddress: fields.siteAddress.value.trim(),
-      workers: workers,
-      worksCarried: fields.worksCarried.value.trim(),
-      machines: machines,
-      equipment: equipment,
-      costPurchased: num(fields.costPurchased.value),
-      costStock: num(fields.costStock.value),
-      relineCost: num(fields.relineCost.value),
-      flexCost: num(fields.flexCost.value),
-      hoursNormal: num(fields.hoursNormal.value),
-      hoursApprentice: num(fields.hoursApprentice.value),
-      hoursAfter: num(fields.hoursAfter.value),
-      photoCount: photos.length
-    };
-  }
-  function applyFormData(data){
-    fields.jobType.value = data.jobType || "";
-    fields.jobDate.value = data.jobDate || fields.jobDate.value;
-    fields.customer.value = data.customer || "";
-    fields.jobCode.value = data.jobCode || "";
-    fields.siteAddress.value = data.siteAddress || "";
-    var workersData = data.workers || [];
-    workerCheckboxes.forEach(function(cb){
-      if(!cb) return;
-      cb.checked = workersData.indexOf(cb.value) !== -1;
-    });
-    fields.worksCarried.value = data.worksCarried || "";
-    fields.mReline.checked = (data.machines||[]).some(function(m){return m.indexOf("Re-Lining")===0;});
-    fields.mFlex.checked = (data.machines||[]).some(function(m){return m.indexOf("Flex Shaft")===0;});
-    var otherM = (data.machines||[]).find(function(m){return m.indexOf("Other")===0;});
-    fields.mOther.checked = !!otherM;
-    $("mOtherWrap").classList.toggle("show", !!otherM);
-    if(otherM){
-      var match = otherM.match(/\((.*)\)/);
-      fields.mOtherText.value = match ? match[1] : "";
+function doPost(e) {
+  try {
+    if (!e || !e.postData || !e.postData.contents) {
+      return jsonResponse({ ok: false, error: "No data received" });
     }
-    var eqData = data.equipment || [];
-    equipmentCheckboxes.forEach(function(cb){
-      if(!cb) return;
-      cb.checked = eqData.some(function(e){ return e.indexOf(cb.value) === 0; });
-    });
-    fields.costPurchased.value = data.costPurchased || "";
-    fields.costStock.value = data.costStock || "";
-    fields.relineCost.value = data.relineCost || "";
-    fields.flexCost.value = data.flexCost || "";
-    fields.hoursNormal.value = data.hoursNormal || "";
-    fields.hoursApprentice.value = data.hoursApprentice || "";
-    fields.hoursAfter.value = data.hoursAfter || "";
-    recalcTotal();
-  }
-  var saveDraftTimer;
-  function saveDraft(){
-    clearTimeout(saveDraftTimer);
-    saveDraftTimer = setTimeout(function(){
-      try{
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(collectFormData()));
-      }catch(e){}
-    }, 250);
-  }
+    var data = JSON.parse(e.postData.contents);
 
-  function loadDraftIfAny(){
-    try{
-      var raw = localStorage.getItem(DRAFT_KEY);
-      if(!raw) return;
-      var data = JSON.parse(raw);
-      var hasContent = data.customer || data.jobCode || data.worksCarried || data.jobType;
-      if(hasContent){
-        $("resumeBanner").classList.remove("hidden");
-        $("resumeYes").onclick = function(){
-          applyFormData(data);
-          $("resumeBanner").classList.add("hidden");
-          toast("Draft restored");
-        };
-        $("resumeNo").onclick = function(){
-          localStorage.removeItem(DRAFT_KEY);
-          $("resumeBanner").classList.add("hidden");
-        };
-      }
-    }catch(e){}
-  }
-  loadDraftIfAny();
-
-  // ---------- photos ----------
-  $("btnTakePhoto").addEventListener("click", function(){ $("cameraInput").click(); });
-  $("btnAddGallery").addEventListener("click", function(){ $("galleryInput").click(); });
-
-  function compressImage(file, cb){
-    var img = new Image();
-    var reader = new FileReader();
-    reader.onload = function(e){
-      img.onload = function(){
-        var maxDim = 1600;
-        var w = img.width, h = img.height;
-        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
-        else if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
-        var canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, w, h);
-        canvas.toBlob(function(blob){
-          cb(blob || file);
-        }, "image/jpeg", 0.72);
-      };
-      img.onerror = function(){ cb(file); };
-      img.src = e.target.result;
-    };
-    reader.onerror = function(){ cb(file); };
-    reader.readAsDataURL(file);
-  }
-
-  function addFiles(fileList){
-    Array.prototype.forEach.call(fileList, function(file){
-      if(!/^image\//.test(file.type)) return;
-      compressImage(file, function(blob){
-        var url = URL.createObjectURL(blob);
-        var id = photoIdSeq++;
-        photos.push({ id: id, blob: blob, url: url, name: "photo_" + id + ".jpg" });
-        renderPhotos();
-        saveDraft();
-      });
-    });
-  }
-  $("cameraInput").addEventListener("change", function(e){ addFiles(e.target.files); e.target.value = ""; });
-  $("galleryInput").addEventListener("change", function(e){ addFiles(e.target.files); e.target.value = ""; });
-
-  function renderPhotos(){
-    var grid = $("photoGrid");
-    grid.innerHTML = "";
-    $("photoEmpty").classList.toggle("hidden", photos.length > 0);
-    photos.forEach(function(p){
-      var div = document.createElement("div");
-      div.className = "photo-thumb";
-      var img = document.createElement("img");
-      img.src = p.url;
-      var rm = document.createElement("button");
-      rm.className = "rm"; rm.type = "button"; rm.textContent = "×";
-      rm.addEventListener("click", function(){
-        photos = photos.filter(function(x){ return x.id !== p.id; });
-        renderPhotos();
-        saveDraft();
-      });
-      div.appendChild(img); div.appendChild(rm);
-      grid.appendChild(div);
-    });
-  }
-  renderPhotos();
-
-  // ---------- validation ----------
-  var requiredFields = [
-    { el: fields.jobType, wrap: "jobType" },
-    { el: fields.customer, wrap: "customer" },
-    { el: fields.jobCode, wrap: "jobCode" }
-  ];
-  function validate(){
-    var ok = true, firstInvalid = null;
-    requiredFields.forEach(function(rf){
-      var wrapEl = document.querySelector('[data-field="' + rf.wrap + '"]');
-      var val = rf.el.value.trim();
-      var invalid = !val;
-      wrapEl.classList.toggle("invalid", invalid);
-      if(invalid){ ok = false; if(!firstInvalid) firstInvalid = wrapEl; }
-    });
-    var workersWrap = document.querySelector('[data-field="workers"]');
-    var anyWorkerChecked = workerCheckboxes.some(function(cb){ return cb && cb.checked; });
-    workersWrap.classList.toggle("invalid", !anyWorkerChecked);
-    if(!anyWorkerChecked){ ok = false; if(!firstInvalid) firstInvalid = workersWrap; }
-    if(firstInvalid) firstInvalid.scrollIntoView({behavior:"smooth", block:"center"});
-    return ok;
-  }
-
-  // ---------- summary text ----------
-  function buildSummaryText(data, totals){
-    var lines = [];
-    lines.push("KILKENNYBROS PLUMBING — JOB SHEET");
-    lines.push("To: " + OFFICE_EMAIL);
-    lines.push("");
-    lines.push("Type: " + (data.jobType || "-"));
-    lines.push("Date: " + (data.jobDate || "-"));
-    lines.push("Customer: " + (data.customer || "-"));
-    lines.push("Job Code: " + (data.jobCode || "-"));
-    lines.push("Site Address: " + (data.siteAddress || "-"));
-    lines.push("Workers: " + (data.workers && data.workers.length ? data.workers.join(", ") : "-"));
-    lines.push("");
-    lines.push("Works Carried Out:");
-    lines.push(data.worksCarried || "-");
-    lines.push("");
-    lines.push("Machines Used: " + (data.machines.length ? data.machines.join(", ") : "-"));
-    lines.push("Equipment / Services Used: " + (data.equipment.length ? data.equipment.join(", ") : "-"));
-    lines.push("");
-    lines.push("(All amounts below are excl. GST unless stated)");
-    lines.push("Purchased - Material Cost: " + money(data.costPurchased));
-    lines.push("Stock on Hand - Material Cost: " + money(data.costStock));
-    lines.push("Re-Lining Cost: " + money(data.relineCost));
-    lines.push("Flex Shaft Cost: " + money(data.flexCost));
-    lines.push("Equipment Cost: " + money(totals.equipmentCost));
-    lines.push("Hours ($110 p/h): " + data.hoursNormal);
-    lines.push("Apprentice Hours ($45 p/h): " + data.hoursApprentice);
-    lines.push("After Hours ($245 p/h): " + data.hoursAfter + " hrs = " + money(data.hoursAfter * 245));
-    lines.push("");
-    lines.push("Subtotal (excl. GST): " + money(totals.subtotalExGST) + "  (Labour " + money(totals.labour) + " + Materials " + money(totals.materials) + ")");
-    lines.push("GST (10%): " + money(totals.gst));
-    lines.push("Total (inc. GST): " + money(totals.total));
-    lines.push("");
-    lines.push("Photos attached: " + photos.length);
-    return lines.join("\n");
-  }
-
-  // ---------- history ----------
-  function loadHistory(){
-    try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }catch(e){ return []; }
-  }
-  function saveHistory(list){
-    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
-    $("histCount").textContent = list.length;
-  }
-  function addHistoryEntry(data, totals, summaryText, status){
-    var list = loadHistory();
-    list.unshift({
-      id: Date.now(),
-      customer: data.customer, jobCode: data.jobCode, jobDate: data.jobDate,
-      total: totals.total, photoCount: photos.length, status: status,
-      summary: summaryText
-    });
-    saveHistory(list);
-    return list[0].id;
-  }
-  function updateHistoryStatus(id, status){
-    var list = loadHistory();
-    var item = list.find(function(x){ return x.id === id; });
-    if(item){ item.status = status; saveHistory(list); }
-  }
-  function renderHistory(){
-    var list = loadHistory();
-    $("histCount").textContent = list.length;
-    var wrap = $("histList");
-    wrap.innerHTML = "";
-    if(!list.length){
-      wrap.innerHTML = '<div class="empty-state">No job sheets saved on this device yet.</div>';
-      return;
+    if (data.token !== SHARED_SECRET) {
+      return jsonResponse({ ok: false, error: "Invalid token" });
     }
-    list.forEach(function(item){
-      var div = document.createElement("div");
-      div.className = "hist-item";
-      var pillClass = item.status === "Shared" ? "status-shared" : "status-saved";
-      div.innerHTML =
-        '<div class="hist-top">' +
-          '<div><strong>' + escapeHtml(item.customer || "(no customer)") + '</strong>' +
-          '<div class="hist-meta">' + escapeHtml(item.jobCode || "") + ' · ' + escapeHtml(item.jobDate || "") + ' · ' + money(item.total || 0) + ' · ' + (item.photoCount||0) + ' photo(s)</div></div>' +
-          '<span class="status-pill ' + pillClass + '">' + escapeHtml(item.status) + '</span>' +
-        '</div>' +
-        '<div class="hist-actions">' +
-          '<button data-act="copy">Copy Summary</button>' +
-          '<button data-act="delete">Delete</button>' +
-        '</div>';
-      div.querySelector('[data-act="copy"]').addEventListener("click", function(){
-        copyText(item.summary);
-      });
-      div.querySelector('[data-act="delete"]').addEventListener("click", function(){
-        var list2 = loadHistory().filter(function(x){ return x.id !== item.id; });
-        saveHistory(list2);
-        renderHistory();
-      });
-      wrap.appendChild(div);
-    });
-  }
-  function escapeHtml(s){
-    return String(s || "").replace(/[&<>"']/g, function(c){
-      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
-    });
-  }
 
-  // ---------- clipboard ----------
-  function copyText(text){
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){ toast("Copied"); }).catch(function(){ fallbackCopy(text); });
-    } else {
-      fallbackCopy(text);
+    if (data.action === "markProcessed") {
+      return handleMarkProcessed(data);
     }
+    return handleSubmission(data);
+  } catch (err) {
+    return jsonResponse({ ok: false, error: String(err) });
   }
-  function fallbackCopy(text){
-    var ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try{ document.execCommand("copy"); toast("Copied"); }catch(e){}
-    document.body.removeChild(ta);
-  }
+}
 
-  // ---------- submit flow ----------
-  var currentSummary = "", currentHistId = null, currentData = null, currentTotals = null;
+function handleSubmission(data) {
+  var jobCode = String(data.jobCode || "job").replace(/[^a-zA-Z0-9_-]+/g, "_");
+  var pdfUrl = "";
 
-  $("submitBtn").addEventListener("click", function(){
-    if(!validate()){ toast("Please fill in the required fields"); return; }
-    var data = collectFormData();
-    var totals = recalcTotal();
-    var summary = buildSummaryText(data, totals);
-    currentSummary = summary; currentData = data; currentTotals = totals;
-    currentHistId = addHistoryEntry(data, totals, summary, "Saved");
-    try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
-    copyText(OFFICE_EMAIL);
-    showConfirm();
-  });
-
-  function showConfirm(){
-    formView.classList.add("hidden");
-    histView.classList.add("hidden");
-    submitBar.classList.add("hidden");
-    confirmView.classList.remove("hidden");
-    tabFormBtn.classList.remove("active");
-    tabHistBtn.classList.remove("active");
+  if (data.pdfBase64) {
+    var folder = DriveApp.getFolderById(PDF_FOLDER_ID);
+    var bytes = Utilities.base64Decode(data.pdfBase64);
+    var blob = Utilities.newBlob(bytes, "application/pdf", "JobSheet_" + jobCode + "_" + Date.now() + ".pdf");
+    var file = folder.createFile(blob);
+    pdfUrl = file.getUrl();
   }
 
-  $("copyEmailBtn").addEventListener("click", function(){ copyText(OFFICE_EMAIL); });
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var rowNum = sheet.getLastRow() + 1;
+  sheet.getRange(rowNum, 1, 1, 10).setValues([[
+    new Date(),
+    false,
+    data.jobCode || "",
+    data.customer || "",
+    data.jobType || "",
+    data.jobDate || "",
+    data.siteAddress || "",
+    (data.workers || []).join(", "),
+    data.total || "",
+    pdfUrl
+  ]]);
+  sheet.getRange(rowNum, 2, 1, 1).insertCheckboxes();
 
-  function summaryFileName(){
-    return "JobSheet_" + (currentData.jobCode || "job").replace(/[^a-z0-9_-]+/gi, "_") + ".txt";
+  sendNotification(data, pdfUrl);
+
+  return jsonResponse({ ok: true });
+}
+
+/**
+ * Ticks or unticks the "Invoiced" checkbox for one row, sent from the
+ * app's "Team" tab when someone taps the Invoiced checkbox there.
+ */
+function handleMarkProcessed(data) {
+  var row = parseInt(data.rowIndex, 10);
+  if (!row || row < 2) {
+    return jsonResponse({ ok: false, error: "Bad row index" });
   }
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  sheet.getRange(row, 2, 1, 1).setValue(!!data.processed);
+  return jsonResponse({ ok: true });
+}
 
-  $("shareBtn").addEventListener("click", function(){
-    var summaryFile = new File([currentSummary], summaryFileName(), { type: "text/plain" });
-    var photoFiles = photos.map(function(p){ return new File([p.blob], p.name, { type: "image/jpeg" }); });
-    var files = [summaryFile].concat(photoFiles);
-    var shortNote = "Job Sheet attached for " + (currentData.customer || "customer") + " (" + (currentData.jobCode || "-") + "). " + photos.length + " photo(s) attached.";
-    var shareData = {
-      title: "Job Sheet - " + (currentData.jobCode || "") + " - " + (currentData.customer || ""),
-      text: shortNote,
-      files: files
-    };
-    if(navigator.canShare && navigator.canShare({ files: files }) && navigator.share){
-      navigator.share(shareData).then(function(){
-        if(currentHistId) updateHistoryStatus(currentHistId, "Shared");
-        toast("Shared");
-      }).catch(function(err){
-        if(err && err.name !== "AbortError") toast("Share cancelled or failed");
-      });
-    } else if(navigator.share){
-      // Fallback: this device/browser can't share files, only text — send the full summary as text so nothing is lost.
-      navigator.share({ title: shareData.title, text: currentSummary }).then(function(){
-        if(currentHistId) updateHistoryStatus(currentHistId, "Shared");
-      }).catch(function(){});
-    } else {
-      toast("Sharing not supported on this browser — use Download Job Sheet + Photos, then Open Email instead");
+/**
+ * Returns the most recent submissions as JSON so the app's "Team" tab can
+ * show everyone's job sheets, not just the ones done on this device.
+ * Called as: <Web App URL>?token=...
+ */
+function doGet(e) {
+  var token = e && e.parameter && e.parameter.token;
+  if (token !== SHARED_SECRET) {
+    return jsonResponse({ ok: false, error: "Invalid token" });
+  }
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    var lastRow = sheet.getLastRow();
+    var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+    if (lastRow < 2) {
+      return jsonResponse({ ok: true, rows: [], sheetUrl: sheetUrl });
     }
-  });
+    var numRows = Math.min(lastRow - 1, 200);
+    var startRow = lastRow - numRows + 1;
+    var values = sheet.getRange(startRow, 1, numRows, 10).getValues();
+    var rows = [];
+    for (var i = values.length - 1; i >= 0; i--) {
+      var r = values[i];
+      rows.push({
+        rowIndex: startRow + i,
+        timestamp: (r[0] instanceof Date) ? r[0].toISOString() : String(r[0]),
+        processed: !!r[1],
+        jobCode: r[2],
+        customer: r[3],
+        jobType: r[4],
+        jobDate: r[5],
+        siteAddress: r[6],
+        workers: r[7],
+        total: r[8],
+        pdfUrl: r[9]
+      });
+    }
+    return jsonResponse({ ok: true, rows: rows, sheetUrl: sheetUrl });
+  } catch (err) {
+    return jsonResponse({ ok: false, error: String(err) });
+  }
+}
 
-  $("mailtoBtn").addEventListener("click", function(){
-    var subject = "Job Sheet - " + (currentData.jobCode || "") + " - " + (currentData.customer || "");
-    var body = "Job sheet for " + (currentData.customer || "-") + " (" + (currentData.jobCode || "-") + ") is attached." +
-      "\n\n(This email app can't auto-attach files — please use \"Download Job Sheet\" and \"Download Photos to Device\" below first, then attach " +
-      (photos.length ? "those " + (photos.length + 1) + " files" : "that file") + " here before sending.)";
-    var url = "mailto:" + encodeURIComponent(OFFICE_EMAIL) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    window.location.href = url;
-  });
+function sendNotification(data, pdfUrl) {
+  var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  var subject = "New job sheet submitted — " + (data.jobCode || "") + " (" + (data.customer || "") + ")";
+  var body =
+    "A new job sheet has come in.\n\n" +
+    "Job Code: " + (data.jobCode || "-") + "\n" +
+    "Customer: " + (data.customer || "-") + "\n" +
+    "Type: " + (data.jobType || "-") + "\n" +
+    "Date: " + (data.jobDate || "-") + "\n" +
+    "Site Address: " + (data.siteAddress || "-") + "\n" +
+    "Workers: " + ((data.workers || []).join(", ") || "-") + "\n" +
+    "Total (inc GST): " + (data.total || "-") + "\n\n" +
+    "View in the spreadsheet: " + sheetUrl + "\n" +
+    (pdfUrl ? ("PDF: " + pdfUrl + "\n") : "");
+  MailApp.sendEmail(NOTIFY_EMAIL, subject, body);
+}
 
-  $("downloadSummaryBtn").addEventListener("click", function(){
-    var blob = new Blob([currentSummary], { type: "text/plain" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url; a.download = summaryFileName();
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
-    toast("Job sheet downloaded");
-  });
+/**
+ * Run this ONCE from the Apps Script editor (select it in the function
+ * dropdown next to the Run button, then click Run) to format the header
+ * row and set up tick-boxes for the Invoiced column.
+ */
+function setupSheet() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var headers = ["Timestamp", "Invoiced", "Job Code", "Customer", "Job Type", "Date", "Site Address", "Workers", "Total (inc GST)", "PDF Link"];
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0b3d63").setFontColor("#ffffff");
+  sheet.setFrozenRows(1);
+  sheet.setColumnWidth(1, 150);
+  sheet.setColumnWidth(2, 90);
+  sheet.setColumnWidth(4, 160);
+  sheet.setColumnWidth(7, 200);
+  sheet.setColumnWidth(8, 160);
+  sheet.setColumnWidth(10, 220);
+  // Pre-apply checkboxes to the Invoiced column for the next 2000 rows
+  // so every future submission automatically shows a tick-box.
+  sheet.getRange(2, 2, 2000, 1).insertCheckboxes();
+}
 
-  $("downloadPhotosBtn").addEventListener("click", function(){
-    if(!photos.length){ toast("No photos to download"); return; }
-    photos.forEach(function(p, i){
-      setTimeout(function(){
-        var a = document.createElement("a");
-        a.href = p.url; a.download = (currentData.jobCode || "job") + "_" + (i+1) + ".jpg";
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      }, i * 300);
-    });
-    toast("Downloading photos...");
-  });
-
-  $("newJobBtn").addEventListener("click", function(){
-    document.getElementById("jobForm").reset();
-    photos.forEach(function(p){ URL.revokeObjectURL(p.url); });
-    photos = [];
-    renderPhotos();
-    fields.jobDate.value = new Date().toISOString().slice(0,10);
-    $("mOtherWrap").classList.remove("show");
-    document.querySelectorAll(".field.invalid").forEach(function(el){ el.classList.remove("invalid"); });
-    recalcTotal();
-    showTab("form");
-  });
-
-  // init history count
-  saveHistory(loadHistory());
-})();
-</script>
-</body>
-</html>
+function jsonResponse(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
